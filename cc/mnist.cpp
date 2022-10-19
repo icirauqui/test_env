@@ -84,7 +84,7 @@ int main(int argc, char** argv) {
   fl::setSeed(1);
   //std::string data_dir = argv[1];
 
-  std::string data_dir = "/home/icirauqui/w4rkspace/test/datasets/mnist";
+  std::string data_dir = "/home/icirauqui/w4rkspace/test_env/datasets/mnist";
 
   float learning_rate = 1e-2;
   int epochs = 10;

@@ -24,6 +24,25 @@ cc_binary(
 
 
 cc_binary(
+    name = "tff",
+    srcs = ["cc/tff.cpp"],
+    visibility = ["//visibility:public"],
+    linkopts = [
+        "-fno-strict-aliasing",
+        "-fwrapv",
+        "-fexcess-precision=standard",
+        "-fPIC",
+        "-shared",
+    ],
+    linkshared=True,
+    linkstatic=True,
+    deps = [
+        "@postgres14//:pg_headers",
+    ],
+)
+
+
+cc_binary(
     name = "main",
     srcs = ["cc/main.cpp"],
     visibility = ["//visibility:public"],
@@ -146,4 +165,71 @@ cmake(
     lib_source = "@flashlight//:all_srcs",
     out_static_libs = ["libflashlight.a"],
     visibility = ["//visibility:public"],
+)
+
+
+
+
+######################
+## Generate packages #
+######################
+
+load("@rules_pkg//pkg:mappings.bzl", "pkg_attributes", "pkg_filegroup", "pkg_files", "pkg_mkdirs", "strip_prefix")
+load("@rules_pkg//pkg:tar.bzl", "pkg_tar")
+load("@rules_pkg//pkg:zip.bzl", "pkg_zip")
+load("@rules_pkg//pkg:deb.bzl", "pkg_deb")
+
+pkg_files(
+    name = "libaf",
+    srcs = [
+        ":arrayfire",
+    ],
+    prefix = "/tmp/lib/x86_64-linux-gnu",
+)
+
+
+#genrule(
+#    name = "generate_files",
+#    outs = [
+#        "etc/example.conf",
+#        "usr/bin/a_binary",
+#    ],
+#    cmd = "for i in $(OUTS); do echo 1 >$$i; done",
+#)
+
+pkg_tar(
+    name = "transf",
+    strip_prefix = "/cc",
+    package_dir = "/tmp/bazeltest",
+    srcs = ["cc/str2vec.cpp"],
+    mode = "0755",
+)
+
+pkg_tar(
+    name = "mnist1",
+    strip_prefix = "/cc",
+    package_dir = "/tmp/bazeltest1",
+    srcs = ["cc/str2vec"],
+    mode = "0755",
+)
+
+pkg_tar(
+    name = "pack",
+    extension = "tar.gz",
+    deps = [
+        ":transf",
+        ":mnist1",
+    ],
+)
+
+pkg_deb(
+    name = "switch",
+    architecture = "amd64",
+    built_using = "unzip",
+    data = ":pack",
+    depends = ["unzip"],
+    description = "A test package",
+    package = "switch",
+    version = "1.0.0",
+    maintainer = "Bazel",
 )

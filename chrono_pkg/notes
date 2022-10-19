@@ -1,0 +1,126 @@
+
+"""
+pkg_tar(
+    name = "tar",
+    srcs = [
+        ":chrono",
+    ],
+    mode = "0755",
+    package_dir = "/usr/bin",
+)
+
+pkg_deb(
+    name = "deb",
+    architecture = "amd64",
+    data = ":tar",
+    depends = [
+        "libc6 (>= 2.14)",
+    ],
+    description = "Measure times in C++ code",
+    maintainer = "icirauqui",
+    package = "chrono",
+    version = "0.1.0",
+)
+"""
+
+
+
+"""
+# Mapping rules
+# Maps labels to relative destinations or create entities
+pkg_files()
+
+pkg_mkdirs(
+    name = "owned-dirs",
+    dirs = [
+        "/opt/chrono",
+        "/opt/chrono/etc",
+    ]
+)
+
+pkg_mklinks(
+    name = "links",
+    links = {
+        "/etc/chrono", 
+        "/opt/chrono/etc",
+    }
+)
+
+
+
+
+
+# Grouping rules
+# Provide grouping and additional transformations to mapping rules
+
+pkg_filegroup(
+    name = "chrono-pkg",
+    srcs = [
+        ":chrono",
+    ],
+    attrs = {"unix": ("0755", "icirauqui", "icirauqui")},
+    section = "config",
+    prefix = "/usr/bin",
+    renames = {
+        ":chrono": "chrono.bin",
+    },
+)
+
+
+
+# Packaging rules
+# Materialize grouping rules
+pkg_rpm()
+pkg_zip()
+pkg_tar()
+pkg_deb()
+
+
+
+pkg_rpm(
+    name = "chrono-rpm",
+    rpm_name = "chrono",
+    data = [
+        ":chrono-pkg",
+        ":owned-dirs",
+        ":links",
+    ],
+)
+"""
+
+
+
+
+
+
+
+
+
+
+
+
+"""
+genrule(
+    name = "generate_files",
+    outs = [
+        "etc/chrono_conf.conf",
+        "usr/bin/chrono_binary",
+    ],
+    cmd = "for i in $(OUTS); do echo 1 >$$i; done",
+)
+
+pkg_tar(
+    name = "chrono_tar",
+    srcs = [":generate_files"],
+)
+
+pkg_deb(
+    name = "deb",
+    data = ":chrono_tar",
+    description = "Chrono for C++",
+    maintainer = "icirauqui@gmail.com",
+    package = "chrono",
+    version = "1.0.0",
+)
+
+"""

@@ -64,3 +64,36 @@ http_archive(
       strip_prefix = "flashlight-0.3.2",
       urls = ["https://github.com/flashlight/flashlight/archive/refs/tags/v0.3.2.tar.gz"],
 );
+
+
+
+#################
+# Postgresql 14 #
+#################
+
+http_archive(
+    name = "postgres14",
+    url = "https://github.com/postgres/postgres/archive/REL_14_STABLE.tar.gz",
+    build_file = "//:postgres.BUILD",
+    strip_prefix = "postgres-REL_14_STABLE",
+    sha256 = "ed4d9c3f9778236890d82f9894799b0674095520859203b078aa16949507dd0a",
+)
+
+
+
+#############
+# Rules PKG #
+#############
+
+http_archive(
+    name = "rules_pkg",
+    urls = [
+        "https://mirror.bazel.build/github.com/bazelbuild/rules_pkg/releases/download/0.7.1/rules_pkg-0.7.1.tar.gz",
+        "https://github.com/bazelbuild/rules_pkg/releases/download/0.7.1/rules_pkg-0.7.1.tar.gz",
+    ],
+    sha256 = "451e08a4d78988c06fa3f9306ec813b836b1d076d0f055595444ba4ff22b867f",
+)
+load("@rules_pkg//:deps.bzl", "rules_pkg_dependencies")
+rules_pkg_dependencies()
+
+
